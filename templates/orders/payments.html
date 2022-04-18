@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section class="section-content padding-y bg">
+  <div class="container">
+
+    <!-- ============================ COMPONENT 1 ================================= -->
+    <h4 class="text-center mb-20">Review Your Order and Make Payment</h4>
+    <div class="row">
+      <aside class="col-lg-8">
+        <div class="card">
+          <h5 class="card-header">Billing Address</h5>
+          <div class="card-body">
+            <p class="card-text mb-0">{{order.full_name}}</p>
+            <p class="card-text mb-0">{{order.full_address}}</p>
+            <p class="card-text mb-0">{{order.city}}, {{order.state}}</p>
+            <p class="card-text mb-0">{{order.country}}</p>
+            {% if order.order_note %}
+            <b>Order Note:</b>{{order.order_note}}
+            {% endif %}
+          </div>
+        </div> <!-- card.// -->
+        <div class="card"  style="background-color: transparent; border:none;">
+        
+          <div class="card-body" style="background-color: transparent;">
+
+
+          </div>
+        </div> <!-- card.// -->
+        <div class="card">
+          <h5 class="card-header">Review Products</h5>
+          <div class="card-body">
+            <table class="table table-borderless table-shopping-cart">
+              <thead class="text-muted">
+                <tr class="small text-uppercase">
+                  <th scope="col">Product</th>
+                  <th scope="col" width="120">Quantity</th>
+                  <th scope="col" width="120">Price</th>
+                  <th scope="col" class="text-right" width="200"> </th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for cart_item in cart_items %}
+                <tr>
+                  <td>
+                    <figure class="itemside align-items-center">
+                      <div class="aside"><img src="{{ cart_item.product.images.url }}" class="img-sm"></div>
+                      <figcaption class="info">
+                        <a href="{{ cart_item.product.get_url }}" class="title text-dark">{{ cart_item.product.product_name }}</a>
+                        
+                      </figcaption>
+                    </figure>
+                  </td>
+                  <td>
+                    <!-- col.// -->
+                    <label for="">{{cart_item.quantity}}</label>
+                  </td>
+                  <td>
+                    <div class="price-wrap">
+                      <var class="price">$ {{cart_item.sub_total }}</var>
+                      <small class="text-muted"> $ {{ cart_item.product.price }} each </small>
+                    </div> <!-- price-wrap .// -->
+                  </td>
+
+                </tr>
+
+                {% endfor %}
+
+
+
+              </tbody>
+            </table>
+          </div>
+        </div> <!-- card.// -->
+
+      </aside> <!-- col.// -->
+      <aside class="col-lg-4">
+
+        <div class="card">
+          <div class="card-body">
+            <dl class="dlist-align">
+              <dt>Total price:</dt>
+              <dd class="text-right">$ {{ total }}</dd>
+            </dl>
+            <dl class="dlist-align">
+              <dt>Tax:</dt>
+              <dd class="text-right"> $ {{ tax }}</dd>
+            </dl>
+            <dl class="dlist-align">
+              <dt>Grand Total:</dt>
+              <dd class="text-right text-dark b"><strong>$ {{ order.order_total }}</strong></dd>
+            </dl>
+            <dl class="dlist-align">
+              <dt>Nett Paid:</dt>
+              <dd class="text-right text-dark b"><strong>$ {{ order.nett_paid }}</strong></dd>
+            </dl>
+            <span id="discountsID" hidden>
+              <dl class="dlist-align">
+                <dt>Discount amount:</dt>
+                <dd class="text-right" id="discAmount"> </dd>
+              </dl>
+              <dl class="dlist-align">
+                <dt>Nett Payable:</dt>
+                <dd class="text-right text-dark b" id="discGrandTotal" style="color: darkgreen;"> <strong> amount
+                  </strong></dd>
+              </dl>
+            </span>
+
+            <hr>
+            <p class="text-center mb-3">
+              <img src="{% static 'images/misc/payments.png' %}" height="26">
+            </p>
+           
+
+              <!-- Paypal -->
+              <div id="paypal_container"> {{ form.render }}</div>
+              <!-- Razorpay -->
+              <button id="rzp-button1" class="btn btn-secondary btn-block mb-2 mt-2">RazorPay</button>
+              <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+              <script>
+              var options = {
+                  "key": "rzp_test_N9YYgyoIQNNsad", // Enter the Key ID generated from the Dashboard
+                  "amount": "{{amount}} ", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                  "currency": "INR",
+                  "name": "GreatKart",
+                  "description": "Test Transaction",
+                  "image": "{% static './images/logo.png' %}",
+                  "order_id": "{{payment.id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                  "callback_url": "{% url 'razorpay_order_complete' %}",
+                  "prefill": {
+                      "name": "afsul rahman",
+                      "email": "afsul@gmail.com",
+                      "contact": "8547129907"
+                  },
+                  "notes": {
+                      "address": "Razorpay Corporate Office"
+                  },
+                  "theme": {
+                      "color": "#3399cc"
+                  }
+              };
+              var rzp1 = new Razorpay(options);
+              document.getElementById('rzp-button1').onclick = function(e){
+                  rzp1.open();
+                  e.preventDefault();
+              }
+              </script>
+
+
+           <!-- cash on delivery  -->
+            <a href="{% url 'cod_order_complete' order.order_number %}" class="btn btn-success btn-block">Cash On
+              Delivery</a>
+
+
+          </div> <!-- card-body.// -->
+        </div> <!-- card.// -->
+
+      </aside> <!-- col.// -->
+
+
+    </div> <!-- row.// -->
+
+  </div> <!-- container .//  -->
+</section>
+
+
+
+
+ 
+{% endblock %}

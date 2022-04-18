@@ -1,0 +1,65 @@
+
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+ 
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}">
+    <link href="{% static 'assets/vendor/fonts/circular-std/style.css' %}" rel="stylesheet">
+     <link rel="stylesheet" href="{% static 'assets/libs/css/style.css' %}">
+     <link rel="stylesheet" href="{% static 'assets/vendor/fonts/fontawesome/css/fontawesome-all.css' %}">
+
+
+
+
+    <title>GreatKart</title>
+</head>
+
+<body>
+    
+    <div class="dashboard-main-wrapper">
+       
+   {% include 'admin/includes/admin-navbar.html' %}
+   {% include 'admin/includes/admin-menubar.html' %}
+        <div class="dashboard-wrapper">
+            <div class="dashboard-ecommerce">
+                <div class="container-fluid dashboard-content ">
+                 
+                   
+            
+{% block content %}
+
+<!-- Page content -->
+
+{% endblock %}
+
+{% block script %}
+{% endblock script %}
+
+
+</div>
+</div>
+{% include 'admin/includes/admin-footer.html' %}
+
+
+</div>
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+<script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.js' %}"></script>
+
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,49 @@
+ {% load static %}
+ <!-- left sidebar -->
+        <!-- ============================================================== -->
+        <div class="nav-left-sidebar sidebar-dark">
+            <div class="menu-list">
+                <nav class="navbar navbar-expand-lg navbar-light">
+                    <a class="d-xl-none d-lg-none" href="{% url 'admin_home' %}">Dashboard</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        {% with request.resolver_match.url_name as url_name %}
+                        <ul class="navbar-nav flex-column">
+                            <li class="nav-divider">
+                                
+                            </li>
+                            <li class="nav-item ">
+                                <a class="nav-link {% if url_name == 'admin_home' %}active{% endif %}" href="{% url 'admin_home' %}" ><i class="fas fa-th"></i>Dashboard</a>
+                               </li>
+                            <li class="nav-item ">
+                                <a class="nav-link {% if url_name == 'user-table' %}active{% endif %}" href="{% url 'user-table' %}" ><i class="fa fa-users"></i>Users</a>
+                               </li>
+                            <li class="nav-item ">
+                                <a class="nav-link {% if url_name == 'category' %}active{% endif %}" href="{% url 'category' %}" ><i class="fa fa-list-alt"></i>Category</a>
+                               </li>
+                            <li class="nav-item ">
+                                <a class="nav-link {% if url_name == 'products_list' %}active{% endif %}" href="{% url 'products_list' %}" ><i class="fa fa-shopping-bag"></i>Products</a>
+                                </li>
+                            <li class="nav-item ">
+                                <a class="nav-link {% if url_name == 'orders_list' %}active{% endif %}" href="{% url 'orders_list' %}" ><i class="fa fa-list"></i>Orders </a>
+                               </li>
+                            <li class="nav-item ">
+                               <a class="nav-link {% if url_name == 'adminsale' %}active{% endif %}" href="{% url 'adminsale' %}" ><i class="fa fa-file"></i>Sales Report </a>
+                                </li>
+                            <li class="nav-item ">
+                               <a class="nav-link {% if url_name == 'admin_offers' %}active{% endif %}" href="{% url 'admin_offers' %}" ><i class="fa fa-tags"></i>Offer Management </a>
+                            </li>
+
+                        </ul>
+                        {% endwith %}
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <!-- ============================================================== -->
+        <!-- end left sidebar -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        
