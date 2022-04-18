@@ -16,7 +16,6 @@ from orders.models import Address, Order
 import razorpay
 from .forms import RegistrationfForm, UserForm, UserProfileForm
 import requests
-from .private import TWILIO_SERVICE_SID,TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN
 from decouple import config
 
 # #Vefication email
