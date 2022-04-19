@@ -64,9 +64,11 @@ def register(request):
                     # Your Account Sid and Auth Token from twilio.com / console
                     account_sid = config('TWILIO_ACCOUNT_SID')
                     auth_token = config('TWILIO_AUTH_TOKEN')
+                    print(account_sid,'<==========================Account sid')
+                    print(auth_token,'<==========================Auth token')
                     client = Client(account_sid, auth_token)
                     verification = client.verify.services(config('TWILIO_SERVICE_SID')).verifications.create(to=user_mobile, channel="sms")
-
+                   
                     print(verification.status)
                     return redirect("new_user_otp_varification")
     else:
@@ -94,6 +96,8 @@ def new_user_otp_varification(request):
                             .verification_checks \
                             .create(to=user_mobile, code=otp)
             print(verification_check.status)
+           
+           
 
             # checking otp is valid or not. If valid redirect home
             if verification_check.status == "approved":
@@ -107,7 +111,6 @@ def new_user_otp_varification(request):
                 #     del request.session["mobile"]
                 # except:
                 #     pass
-
                 # return redirect("home")
             else:
                 messages.error(request, "Invalid OTP")
