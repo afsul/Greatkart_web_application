@@ -18,11 +18,15 @@ from store.models import Product, ProductGallery
 from django.db.models import Count
 import xlwt
 import datetime
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate,login
+from django.views.decorators.cache import never_cache   
 
 
 
 
 #Home
+@login_required(login_url='admin-login')
 def admin_home(request):
     orders = Order.objects.filter(is_ordered=True).order_by('-created_at')
     categories = Category.objects.all().annotate(item_count=Count('product'))
@@ -57,6 +61,7 @@ def admin_home(request):
 
 
 #Admin Login/logout
+@never_cache
 def admin_login(request):
   if  request.session.get('admin_login'):
     return render(request, 'admin/admin-home.html')
@@ -65,17 +70,24 @@ def admin_login(request):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
-        superadmin = auth.authenticate(email=email, password=password)
+        superadmin = authenticate(email=email, password=password)
 
         if superadmin is not None:
-            auth.login(request, superadmin) 
-            request.session['admin_login'] = 'admin_signin' 
-            return redirect('admin_home')
+            if superadmin.is_admin:
+                login(request, superadmin) 
+                request.session['admin_login'] = 'admin_signin' 
+                return redirect('admin_home')  
+                 
+            else:
+                messages.error(request, 'Invalid login credentials')
+                return redirect('admin-login')
         else:
-            messages.error(request, 'Invalid login credentials')
-            return redirect('admin-login')
+                messages.error(request, 'Invalid login credentials')
+                return redirect('admin-login')
     return render(request, 'admin/admin-login.html')
 
+
+@login_required(login_url='admin-login')
 def admin_logout(request):
    
     auth.logout(request)
@@ -128,18 +140,27 @@ def add_category(request):
         form = CategoryForm(request.POST or None, request.FILES or None)
         if form.is_valid():
             form.save()
-        messages.success(request,'Successfully new category added')
-        context = {
+            messages.success(request,'Successfully new category added')
+            context = {
             'form':form
-        }
-        return render(request, 'admin/category/add-category.html', context)
-    else:
-        form = CategoryForm(request.POST or None, request.FILES or None)
+          }
+            return render(request, 'admin/category/add-category.html', context)
+        else:
+            messages.error(request,'Please fill all the fields')
+            form = CategoryForm(request.POST or None, request.FILES or None)
         
-        context = {
-        'form':form
-                 }
-        return render(request, 'admin/category/add-category.html', context)
+            context = {
+            'form':form
+                    }
+            return render(request, 'admin/category/add-category.html', context)
+    else:
+           
+            form = CategoryForm(request.POST or None, request.FILES or None)
+        
+            context = {
+            'form':form
+                    }
+            return render(request, 'admin/category/add-category.html', context)
 
 
 # Category edit

@@ -343,7 +343,7 @@ def razorpay_order_complete(request):
 
 #COD
 def cod_order_complete(request,order_number):
-    print('entering cod complete')
+    print('entering cod complete-------------razorpay')
     print(order_number)
 
     order_number = order_number

@@ -1,6 +1,7 @@
 {% extends 'admin/admin-base.html' %}
 {% load static %}
 {% block content %}
+{%load crispy_forms_tags %} 
  
 <head>
     
@@ -49,7 +50,7 @@
                                 <div class="card-body">
                                     <form method="POST" action="{% url 'edit_category' category.id %}" enctype="multipart/form-data">
                                         {% csrf_token %}
-                                        {{ form.as_p }}
+                                        {{form|crispy}}
                                    
                                     <div class="form-group col-lg-8 mt-3 ">
                                     <button type="submit" class="btn btn-success">Update</button>

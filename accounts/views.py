@@ -64,8 +64,7 @@ def register(request):
                     # Your Account Sid and Auth Token from twilio.com / console
                     account_sid = config('TWILIO_ACCOUNT_SID')
                     auth_token = config('TWILIO_AUTH_TOKEN')
-                    print(account_sid,'<==========================Account sid')
-                    print(auth_token,'<==========================Auth token')
+                  
                     client = Client(account_sid, auth_token)
                     verification = client.verify.services(config('TWILIO_SERVICE_SID')).verifications.create(to=user_mobile, channel="sms")
                    
@@ -204,7 +203,7 @@ def my_orders(request):
     
 @login_required(login_url = 'login')
 def edit_profile(request):
-    userprofile = get_object_or_404(UserProfile, user=request.user)
+    userprofile = get_object_or_404(Address, user=request.user)
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
         profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)

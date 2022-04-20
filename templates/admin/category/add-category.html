@@ -1,7 +1,9 @@
 {% extends 'admin/admin-base.html' %}
 {% load static %}
 {% block content %}
- 
+{%load crispy_forms_tags %} 
+
+ <!-- Jquery validation -->
 <head>
     
     <title>Categories List</title>
@@ -48,9 +50,9 @@
                             <div class="card">
                                 <div class="card-body">
                                     {% include 'includes/alerts.html' %}
-                                    <form method="POST" action="{% url 'add_category' %}" enctype="multipart/form-data">
+                                    <form method="POST" action="{% url 'add_category' %}" novalidate id="addCategoryForm" enctype="multipart/form-data">
                                         {% csrf_token %}
-                                        {{ form }}
+                                        {{ forms|crispy }}
                                    
                                     <div class="form-group col-lg-8 mt-3 ">
                                     <button type="submit" class="btn btn-success">Save</button>
@@ -70,6 +72,51 @@
     <!-- ============================================================== -->
     <!-- end main wrapper -->
     <!-- ============================================================== -->
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
     
+    <script>
+
+        $('#addCategoryForm').validate({
+        rules:{
+            category_name:{
+                required:true,
+                minlength:3,
+            },
+            slug:{
+                required:true,
+                minlength:3,
+            },
+            description:{
+                required:true,
+                minlength:10,
+            },
+            cart_image:{
+                required:true,
+            },
+           
+        
+        },
+        messages:{
+            category_name:{
+                required:"Enter category name.",
+                minlength:"Minimum 3 characters required.",
+                },
+                slug:{
+                required:"Enter slug name",
+                minlength:"Minimum 3 characters required.",
+                },
+                description:{
+                required:"Enter Category Description",
+                minlength:"Minimum 10 characters required.",
+                
+            },
+            cart_image:{
+                required:"Insert image",
+            },
+          
+        
+        },
+        })
+            </script>
     
     {% endblock %}
