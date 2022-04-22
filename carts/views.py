@@ -1,6 +1,6 @@
 from datetime import datetime
 import datetime
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from accounts.models import Account, UserProfile
 from carts.models import Cart, CartItem
@@ -19,7 +19,7 @@ def _cart_id(request):
 
 # Add to cart
 
-def add_cart(request, product_id): 
+def add_cart_id(request, product_id): 
     product =  Product.objects.get(id=product_id) #get the product
     
     try:
@@ -70,7 +70,66 @@ def add_cart(request, product_id):
             print(cart_item, " created new one")
     return redirect('cart')
 
-def remove_cart(request, product_id):
+
+def add_cart(request): 
+    product_id = request.GET['plusId']
+    product =  Product.objects.get(id=product_id) #get the product
+    
+    try:
+        cart = Cart.objects.get(cart_id = _cart_id(request)) #get the cart using the cart id present in the session
+        print(cart)
+    except Cart.DoesNotExist:
+        cart = Cart.objects.create(cart_id = _cart_id(request))
+        cart.save()
+    if request.user.is_authenticated:
+
+        try:
+            #For increasing cart product quanity... if not same product present create a new product item in cart
+            cart_item = CartItem.objects.get(product=product, cart=cart, user = request.user)
+            print(cart_item, "check cart_id present or not")
+            cart_item.quantity += 1 
+            print(cart_item.quantity, "quantity added")
+            cart_item.save()
+            
+        except CartItem.DoesNotExist:
+        
+            cart_item = CartItem.objects.create(
+                product = product,
+                quantity = 1,
+                cart = cart,
+                user = request.user
+            )
+            cart_item.save()
+            print(cart_item, " created new one")
+
+    else:
+        try:
+            #For increasing cart product quanity... if not same product present create a new product item in cart
+            cart_item = CartItem.objects.get(product=product, cart=cart)
+            print(cart_item, "check cart_id present or not")
+            cart_item.quantity += 1 
+            print(cart_item.quantity, "quantity added")
+            cart_item.save()
+            
+        except CartItem.DoesNotExist:
+        
+            cart_item = CartItem.objects.create(
+                product = product,
+                quantity = 1,
+                cart = cart,
+                
+            )
+            cart_item.save()
+            print(cart_item, " created new one")
+            print(cart_item.name)
+            
+    return JsonResponse({
+        "status":True,
+        "qty":cart_item.quantity
+    })
+
+def remove_cart(request):
+    product_id = request.GET['minusId']
     cart = Cart.objects.get(cart_id = _cart_id(request))
     product = get_object_or_404(Product, id=product_id)
     cart_item = CartItem.objects.get(product=product, cart=cart)
@@ -79,7 +138,11 @@ def remove_cart(request, product_id):
         cart_item.save()
     else:
         cart_item.delete()
-    return redirect('cart')
+    return JsonResponse({
+        "status":True,
+        "qty":cart_item.quantity
+        
+    })
 
 def remove_cart_item(request, product_id):
     cart = Cart.objects.get(cart_id =_cart_id(request))

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-
-
 {% block content %}
+
+<!--============================= Zoom Script =============================-->
 <style>.xzoom-gallery {
   margin-top: 10px
 }
@@ -155,7 +155,7 @@ body {
   var gallery = xzoom.gallery().cgallery;
   var i, images = new Array();
   for (i in gallery) {
-  images[i] = {src: gallery[i]};
+    images[i] = {src: gallery[i]};
   }
   $.magnificPopup.open({items: images, type:'image', gallery: {enabled: true}});
   event.preventDefault();
@@ -163,7 +163,7 @@ body {
   }
   });
   })(jQuery);</script>
-<!-- zoom resources -->
+<!--============================= zoom resources =============================-->
 <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/xzoom.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/bbbootstrap/libraries/main/xzoom.css" media="all" />
 <section class="section-content padding-y bg">
@@ -172,15 +172,14 @@ body {
     <!-- ============================ COMPONENT 1 ================================= -->
     <div class="card">
         <div class="row no-gutters">
-            <aside class="col-md-6">
-    <article class="gallery-wrap"> 
-        <div class="img-big-wrap">
-          <div class="xzoom-container mainImage"> <img class="xzoom" id="xzoom-default" src="{{single_product.images.url}}" xoriginal="{{single_product.images.url}}" />
-           <!-- <a  href="#"><img src="{{single_product.images.url}}"></a> -->
-
+            <aside class="col-md-6 ">
+    <article class="gallery-wrap" > 
+        <div class="img-big-wrap d-flex justify-content-center" >
+          <div class="xzoom-container mainImage "> <img class="xzoom"  src="{{single_product.images.url}}" xoriginal= "{{single_product.images.url}}"/>
+            
            
         </div> <!-- img-big-wrap.// -->
-        
+        </div>
     </article> <!-- gallery-wrap .end// -->
     <ul class="thumb">
 
@@ -194,7 +193,7 @@ body {
     </ul>
             </aside>
             <main class="col-md-6 border-left">
-              <form action="{% url 'add_cart' single_product.id %}" method="GET">
+              <form action="" method="GET">
                 {% csrf_token %}
                   <article class="content-body">
                   
@@ -207,42 +206,22 @@ body {
                   <p>{{single_product.description}}</p>
                   
                   
-                  {% comment %} <hr> {% endcomment %}
-                      {% comment %} <div class="row">
-                          <div class="item-option-select">
-                              <h6>Choose Color</h6>
-                              <select name="color" class="form-control">
-                                <option value="" disabled selected>Select</option>
-                                 {% for i in single_product.variation_set.colors %}
-                                <option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst  }}</option>
-                               {% endfor %}
-                              </select>
-                          </div>
-                       </div> <!-- row.// --> {% endcomment %}
-                      {% comment %} <div class="row">
-                          <div class="item-option-select">
-                              <h6>Select Size</h6>
-                              <select name="size" class="form-control">
-                                <option value="" disabled selected>Select</option>
-                                {% for i in single_product.variation_set.sizes %}
-                                <option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>
-                               {% endfor %}
-                              </select>
-                          </div>
-                      </div>   {% endcomment %}
-                      {% comment %} <hr> {% endcomment %}
-                      {% if single_product.stock <= 0 %}
-                      <h5 class="text-danger">Out of Stock</h5>
-                      {% else %}
-                        {% if in_cart %}
-                        <a href="#" class="btn  btn-success"> <span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
-                        <a href="{% url 'cart' %}" class="btn  btn-outline-primary"> <span class="text">View Cart</span> <i class="fas fa-eye"></i>  </a>
-                        {% else %}
-                      <button type="submit" class="btn  btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </button>
-                        {% endif %}
-                      {% endif %}
+                  
+                    
                   </article> <!-- product-info-aside .// -->
   </form>
+
+  {% if single_product.stock <= 0 %}
+  <h5 class="text-danger">Out of Stock</h5>
+  {% else %}
+    {% if in_cart %}
+    <a href="#" class="btn  btn-success m-2"> <span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
+    <a href="{% url 'cart' %}" class="btn  btn-outline-primary "> <span class="text">View Cart</span> <i class="fas fa-eye"></i>  </a>
+    {% else %}
+  <a href="{% url 'add_cart_id' single_product.id %}"  class="btn  btn-primary m-2"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
+    {% endif %}
+  {% endif %}
+
             </main> <!-- col.// -->
         </div> <!-- row.// -->
     </div> <!-- card.// -->

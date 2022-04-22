@@ -327,12 +327,29 @@ def razorpay_order_complete(request):
             product = Product.objects.get(id=item.product_id)
             product.stock -= item.quantity
             product.save()
+        ordered_products = OrderProduct.objects.filter(order_id=order.id)
+        subtotal = 0
+        for i in ordered_products:
+            subtotal = subtotal + i.product_price * i.quantity
+
+        tax = (subtotal * 5)/100
 
         CartItem.objects.filter(user=request.user).delete()
+    context = {
+            'order' : order,
+            'ordered_products' : ordered_products,
+            'order_number': order.order_number,
+            'transID': payment.payment_id,
+            'payment':payment,
+            'subtotal':subtotal,
+            'tax':tax,
+           
+        }
+    
 
 
 
-    return redirect('order_complete')
+    return render(request, 'orders/order_complete2.html',context)
 
 
 

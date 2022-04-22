@@ -3,9 +3,11 @@ from coupon.models import CategoryOffer, ProductOffer
 from store.models import Product
 from datetime import timezone
 from datetime import datetime
+from django.views.decorators.cache import never_cache
 
 
-
+# <================= Home =================>
+@never_cache
 def home(request):
     now = datetime.now()
     products    = Product.objects.all().filter(is_available=True).order_by('created_date')

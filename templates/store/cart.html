@@ -31,7 +31,6 @@
                 <div class="aside"><img src="{{ cart_item.product.images.url }}" class="img-sm"></div>
                 <figcaption class="info">
                     <a href="{{ cart_item.product.get_url }}" class="title text-dark">{{ cart_item.product.product_name }}</a>
-                    
                 </figcaption>
             </figure>
         </td>
@@ -40,15 +39,58 @@
                         <div class="col"> 
                             <div class="input-group input-spinner">
                                 <div class="input-group-prepend">
-                                <a  href="{% url 'remove_cart' cart_item.product.id %}" class="btn btn-light" type="button" id="button-plus"> <i class="fa fa-minus"></i> </a>
+                                <a  href="#" id="quantity1" data-add="add" onclick="MinusBtn('{{cart_item.product.id}}')" class="btn btn-light" type="button"> <i class="fa fa-minus"></i> </a>
                                 </div>
-                                <input type="text" class="form-control"  value="{{ cart_item.quantity }}">
+                                <input type="text" class="form-control p-2" id="quantity"  value="{{ cart_item.quantity }}">
                                 <div class="input-group-append">
-                                <a  href="{% url 'add_cart' cart_item.product.id %}" class="btn btn-light" type="button" id="button-minus"> <i class="fa fa-plus"></i> </a>
+                                <a  href="#" class="btn btn-light" onclick="PlusBtn('{{cart_item.product.id}}')" type="button"> <i class="fa fa-plus"></i> </a>
                                 </div>
                             </div> <!-- input-group.// -->
                         </div> <!-- col.// -->
         </td>
+        <script>
+            function PlusBtn(plusId){
+                var add = $(this).data('add')
+                var data = {'plusId' : plusId}
+
+                $.ajax({
+                    method: "GET",
+                    url:"{% url 'add_cart' %}",
+                    data:data,
+                    dataType:'json',
+                    success: function(data){
+                
+                        if(data.status === true){
+                            $('#quantity').val(data.qty)
+                        }
+                    }
+
+                })
+
+
+            }
+            
+        function MinusBtn(minusId){
+                var data = {'minusId' : minusId}
+
+                $.ajax({
+                    method: "GET",
+                    url:"{% url 'remove_cart' %}",
+                    data:data,
+                    dataType:'json',
+                    success: function(data){
+                        if(data.status === true){
+                            $('#quantity').val(data.qty)
+
+                        }
+                    }
+
+                })
+            }
+
+        </script>
+
+        
         <td> 
             <div class="price-wrap"> 
                 <var class="price">$ {{cart_item.sub_total }}</var> 
@@ -56,7 +98,7 @@
             </div> <!-- price-wrap .// -->
         </td>
         <td class="text-right"> 
-        <a href="{% url 'remove_cart_item' cart_item.product.id %}" class="btn btn-danger"> Remove</a>
+        <a href="{% url 'remove_cart_item' cart_item.product.id %}" class="btn btn-danger">Remove</a>
         </td>
     </tr>
 

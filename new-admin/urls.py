@@ -19,13 +19,13 @@ urlpatterns = [
     path('category/', views.category, name='category'),
     path('add_category/',views.add_category,name='add_category'),
     path('edit_category/<int:id>/',views.edit_category,name='edit_category'),
-    path('delete_category/<int:id>/',views.delete_category,name='delete_category'),
+    path('delete_category',views.delete_category,name='delete_category'),
 
     #Product Management
     path('products_list/',views.products_list,name='products_list'),
     path('add_product/',views.add_product,name='add_product'),
     path('edit_product/<int:id>/',views.edit_product,name='edit_product'),
-    path('product_delete/<int:id>/',views.product_delete,name='product_delete'),
+    path('product_delete/',views.product_delete,name='product_delete'),
     path('add_product_gallery/',views.add_product_gallery_image,name='add_product_gallery'),
     
 
@@ -62,12 +62,4 @@ urlpatterns = [
     path('activate_cat_offer/',views.activate_cat_offer, name = 'activate_cat_offer'),     
     path('block_cat_offer/',views.block_cat_offer, name = 'block_cat_offer'),
     path('delete_cat_offer/',views.delete_cat_offer, name = 'delete_cat_offer'),
-
-    #charts
-    # path('doughnut/',views.doughnut,name='doughnut'),
-
-
-
-    # path('delete_everything/',views.delete_everything,name='delete_everything')
-
 ] 

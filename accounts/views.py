@@ -17,6 +17,7 @@ import razorpay
 from .forms import RegistrationfForm, UserForm, UserProfileForm
 import requests
 from decouple import config
+from django.views.decorators.cache import never_cache
 
 # #Vefication email
 # from django.contrib.sites.shortcuts import get_current_site
@@ -27,7 +28,7 @@ from decouple import config
 
 
 # Create your views here.
-
+@never_cache
 def register(request):
 
     if request.method == 'POST':
@@ -120,7 +121,7 @@ def new_user_otp_varification(request):
         messages.error(request, "Enter a valid OTP")
         return render(request, "accounts/new_user_otp_page.html")
 
-    
+@never_cache
 def login(request):
   if  request.session.get('user_login'):
      
@@ -169,6 +170,10 @@ def login(request):
                 return redirect('login')
   return render(request, 'accounts/login.html')
 
+
+
+# <================= Logout =================>
+@never_cache
 @login_required(login_url = 'login')
 def logout(request):
     try:

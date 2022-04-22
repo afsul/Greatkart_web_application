@@ -23,9 +23,8 @@ from django.contrib.auth import authenticate,login
 from django.views.decorators.cache import never_cache   
 
 
-
-
-#Home
+# <================= Home =================>
+@never_cache
 @login_required(login_url='admin-login')
 def admin_home(request):
     orders = Order.objects.filter(is_ordered=True).order_by('-created_at')
@@ -37,7 +36,7 @@ def admin_home(request):
     total_products = Product.objects.all().count()
     total_sales_amount=0
     for total in orders:
-        total_sales_amount += total.order_total
+        total_sales_amount += total.order_total     
         
 
     
@@ -62,6 +61,7 @@ def admin_home(request):
 
 #Admin Login/logout
 @never_cache
+# @login_required(login_url='admin-login')
 def admin_login(request):
   if  request.session.get('admin_login'):
     return render(request, 'admin/admin-home.html')
@@ -87,6 +87,7 @@ def admin_login(request):
     return render(request, 'admin/admin-login.html')
 
 
+@never_cache
 @login_required(login_url='admin-login')
 def admin_logout(request):
    
@@ -101,22 +102,24 @@ def admin_logout(request):
 
 
 #User Managememt
+
+@login_required(login_url='admin-login')
 def user_list(request):
     users = Account.objects.all()
     context = {'users':users}
     return render(request, 'admin/user_table.html',context)
 
-def user_edit(request):
-    return render(request, 'user_edit.html')
 
-@login_required()
+@login_required(login_url='admin-login')
 def user_deactivate(request, user_id):
     user = Account.objects.get(pk=user_id)
     user.is_active = False
     user.save()
     messages.success(request, "User account has been succesfully deactivated!")    
     return redirect('user-table')
-@login_required()
+
+
+@login_required(login_url='admin-login')
 def user_activate(request, user_id):
     user = Account.objects.get(pk=user_id)
     user.is_active = True
@@ -126,6 +129,7 @@ def user_activate(request, user_id):
 
 
 # Category list
+@login_required(login_url='admin-login')
 def category(request):
     category_items =  Category.objects.all()
     context ={'category_items':category_items}
@@ -133,6 +137,7 @@ def category(request):
 
 
 # Category Add
+@login_required(login_url='admin-login')
 def add_category(request):
     
     if request.method == 'POST':
@@ -164,7 +169,7 @@ def add_category(request):
 
 
 # Category edit
-@login_required()
+@login_required(login_url='admin-login')
 def edit_category(request ,id):
     if request.user.is_authenticated:
         if request.user.is_superadmin:
@@ -193,15 +198,18 @@ def edit_category(request ,id):
                 return render(request, 'admin/category/edit-category.html',context)
 
 # Category delete
-@login_required
-def delete_category(request,id):
-   category = Category.objects.get(id=id)
-   category.delete()
-   return redirect('category')
+@login_required(login_url='admin-login')
+def delete_category(request):
+    
+    cat_id = request.GET['catId']
+    category = Category.objects.get(id = cat_id)
+    category.delete()
+    return redirect('category')
+ 
 
 
 #products list
-
+@login_required(login_url='admin-login')
 def products_list(request):
   
     products = Product.objects.all()
@@ -211,6 +219,7 @@ def products_list(request):
     return render(request, 'admin/products/products_list.html', context)
 
 #add product
+@login_required(login_url='admin-login')
 def add_product(request):
                 print('Entered to add product')
                 if request.method == 'POST':
@@ -252,6 +261,7 @@ def add_product(request):
 
 
 #producgt gallery
+@login_required(login_url='admin-login')
 def add_product_gallery_image(request):
     print('Entered to add product gallery5555555555555555555555555555555555555555555555555555555')
     form = ProductGalleryForm(request.POST or None, request.FILES or None)
@@ -270,6 +280,7 @@ def add_product_gallery_image(request):
             
 
 # Product edit
+@login_required(login_url='admin-login')
 def edit_product(request ,id):
     
      if request.user.is_authenticated:
@@ -297,14 +308,17 @@ def edit_product(request ,id):
                     'product':instance,
                     }
                 return render(request, 'admin/products/edit_product.html',context)
+
 # product delete
-def product_delete(request,id):
-    product = Product.objects.get(id=id)
+@login_required(login_url='admin-login')
+def product_delete(request):
+    pro_id = request.GET['proId']
+    product = Product.objects.get(id = pro_id)
     product.delete()
-    # messages.success(request,"Product deleted successfully.")
     return redirect('products_list')
 
 #Order Management
+@login_required(login_url='admin-login')
 def orders_list(request):
     orders = Order.objects.filter(is_ordered=True).order_by('-created_at')
     context = {
@@ -312,7 +326,9 @@ def orders_list(request):
     }
     return render(request, 'admin/orders/orders_list.html', context)
 
+@login_required(login_url='admin-login')
 def cancel_order_admin(request, id):
+    
     print('entered to cancel function')
     order = Order.objects.get(user = request.user, order_number = id)
     
@@ -324,6 +340,8 @@ def cancel_order_admin(request, id):
     
     return redirect('orders_list')
 
+
+@login_required(login_url='admin-login')
 def add_product_gallery(request):
     if request.method == 'POST':
         form = ProductGalleryForm()
@@ -333,7 +351,10 @@ def add_product_gallery(request):
             form.save()
     return render(request, 'admin/products/add_product_gallery.html')
 
-@login_required(login_url='admin_login')
+
+
+
+@login_required(login_url='admin-login')
 def update_order_status(request, order_number):
 
     instance = get_object_or_404(Order, order_number = order_number)
@@ -359,52 +380,23 @@ def update_order_status(request, order_number):
 
 
 
-# def sales_report(request):    
-#     if request.method == "POST":        
-#         from_date = request.POST["from_date"]
-#         to_date = request.POST["to_date"]
-#         orders = Order.objects.filter(created_at__range=(from_date, to_date))
-        
-#         sales = Order.objects.all()
-
-#         total_sales_amount=0
-#         for total in sales:
-#             total_sales_amount +=  total.nett_paid
-#         print(total_sales_amount,'u777777777777777777777777777')
-
-#         context = {
-#         'orders':orders,
-#         'total_sales_amount':total_sales_amount ,         
-#         }
-#         return render(request,'admin/orders/sales_report.html',context)
-    
-#     else:
-#         orders = Order.objects.all().order_by('-order_number')
-#         total_sales_amount=0
-#         for total in sales:
-#             total_sales_amount +=  total.nett_paid
-#         print(total_sales_amount,'u777777777777777777777777777')
-#         context = {
-#             'orders':orders,      
-#             'total_sales_amount':total_sales_amount ,         
-#         }
-#         return render(request,'admin/orders/sales_report.html',context)
-
-
-
-def export_csv(request):
-    order_data = Order.objects.all()
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename=GreatKart_Sales_Report'+'.csv'
-    writer = csv.writer(response)   
-    writer.writerow(['Customer Name', 'Order No', 'Order Date', 'City','State','Order Amount','Status'])
-    for data in order_data:
-        writer.writerow([data.full_name, data.order_number, data.created_at,data.city, data.state,data.order_total,data.status])
-    return response
 
 
 # @never_cache
-# @login_required(login_url='/iamadmin/')
+# @login_required(login_url='admin-login')
+# def export_csv(request):
+#     order_data = Order.objects.all()
+#     response = HttpResponse(content_type='text/csv')
+#     response['Content-Disposition'] = 'attachment; filename=GreatKart_Sales_Report'+'.csv'
+#     writer = csv.writer(response)   
+#     writer.writerow(['Customer Name', 'Order No', 'Order Date', 'City','State','Order Amount','Status'])
+#     for data in order_data:
+#         writer.writerow([data.full_name, data.order_number, data.created_at,data.city, data.state,data.order_total,data.status])
+#     return response
+
+
+
+@login_required(login_url='admin-login')
 def adminsale(request):
     page = 'salesreport'
     global order_data
@@ -447,21 +439,26 @@ def adminsale(request):
             # order_data = OrderProduct.objects.filter(order__date_order__range=[from_date,to_date]).filter(order__payments__status='Completed').order_by('order__date_order')
             order_data = Order.objects.filter(created_at__range=(from_date,to_date)).filter(is_ordered=True).order_by('created_at')
     print('this is order data',order_data)
+    
+        
 
 
+    
     #Total sales
     total_sales_amount=0
     sales = Order.objects.filter(is_ordered = True)
     for total in sales:
         total_sales_amount += total.nett_paid
-    print(total_sales_amount,"This is total sales *******************************888888")
-    context = {'order_data': order_data, 'years': yr,'page': page,'months':months, 'total_sales_amount':total_sales_amount}
+    sales_amount = round(total_sales_amount,2)
+    print(sales_amount)
+    
+    context = {'order_data': order_data, 'years': yr,'page': page,'months':months, 'sales_amount':sales_amount}
     return render(request,'admin/orders/sales_report2.html', context)
 
 
 
 
-# @never_cache
+@login_required(login_url='admin-login')
 def export_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=SalesReport'+str(datetime.datetime.now())+'.csv'
@@ -474,46 +471,7 @@ def export_csv(request):
     return response
 
 
-
-#@never_cache
-# def export_excel(request):
-
-#     response = HttpResponse(content_type='application/ms-excel')
-#     response['Content-Disposition'] = 'attachment; filename=SalesReport'+str(datetime.datetime.now())+'.xls'
-#     wb = xlwt.Workbook(encoding='utf-8')
-#     ws = wb.add_sheet('Sales Report')
-#     row_num = 0
-#     font_style = xlwt.XFStyle()
-#     font_style.font.bold = True
-#     columns = ['User Id','Name','Order Date','Amount','Payment Type']
-#     order_data = Order.objects.filter(is_ordered=True)
-
-#     for col_num in range(len(columns)):
-#         ws.write(row_num,col_num,columns[col_num],font_style)
-
-#     font_style = xlwt.XFStyle()
-
-#     rows = order_data.values_list(
-#         # 'id','order_customer','order_date','payment_total_amount','payment_payment_method'
-#         # 'id','user__username','date_order','order_status','status'
-#         'id','user__username','created_at','order__status','status'
-#     )
-    
-
-#     for row in rows:
-#         row_num = row_num + 1
-
-#         for col_num in range(len(columns)):
-#              ws.write(row_num,col_num,str(row[col_num]),font_style)
-#     wb.save(response)
-
-#     return response
-    
-
-
-
-
-
+@login_required(login_url='admin-login')
 def admin_offers(request):
     coupon_offers = Coupon.objects.all().order_by('-valid_to')
     prod_offers = ProductOffer.objects.all().order_by('-valid_to')
@@ -538,6 +496,7 @@ def admin_offers(request):
 # Category offers
 
 
+@login_required(login_url='admin-login')
 def add_cat_offer(request):
 
     form = CategoryOfferForm(request.POST or None, request.FILES or None)  
@@ -559,6 +518,7 @@ def add_cat_offer(request):
     
 
 
+@login_required(login_url='admin-login')
 def edit_cat_offer(request,cat_id):
     instance = get_object_or_404(CategoryOffer, id=cat_id)
     form = CategoryOfferForm(request.POST or None, instance=instance)
@@ -583,6 +543,7 @@ def edit_cat_offer(request,cat_id):
         return render(request, 'admin/offer/edit_cat_offer.html',context)
 
 
+@login_required(login_url='admin-login')
 def activate_cat_offer(request):
     offer_id = request.GET['catOffId']
     
@@ -595,6 +556,7 @@ def activate_cat_offer(request):
 
 
 
+@login_required(login_url='admin-login')
 def block_cat_offer(request):
     offer_id = request.GET['catOffId']
     offer = CategoryOffer.objects.get(id = offer_id)
@@ -604,7 +566,7 @@ def block_cat_offer(request):
     return redirect('admin_offers')
 
 
-
+@login_required(login_url='admin-login')
 def delete_cat_offer(request):
     offer_id = request.GET['catOffId']
     offer = CategoryOffer.objects.get(id = offer_id)
@@ -614,6 +576,7 @@ def delete_cat_offer(request):
     return redirect('admin_offers')
 
 #coupon
+@login_required(login_url='admin-login')
 def add_coupon(request):
     form = CouponApplyForm(request.POST or None, request.FILES or None)  
     if request.method == "POST":
@@ -632,7 +595,7 @@ def add_coupon(request):
         }
         return render(request,'admin/offer/add_coupon.html',context)
 
-
+@login_required(login_url='admin-login')
 def edit_coupon(request,c_id):
     instance = get_object_or_404(Coupon, id=c_id)
     form = CouponApplyForm(request.POST or None, instance=instance)
@@ -656,6 +619,8 @@ def edit_coupon(request,c_id):
             }
         return render(request, 'admin/offer/edit_coupon_offer.html',context)
 
+
+@login_required(login_url='admin-login')
 def activate_coupon(request):
     coupon_id = request.GET['couponId']
     coupon = Coupon.objects.get(id = coupon_id)
@@ -665,6 +630,7 @@ def activate_coupon(request):
     return redirect('admin_offers')
 
 
+@login_required(login_url='admin-login')
 def block_coupon(request):
   
     coupon_id = request.GET['couponId']
@@ -675,6 +641,7 @@ def block_coupon(request):
     return redirect('admin_offers')
 
 
+@login_required(login_url='admin-login')
 def delete_coupon(request):
     coupon_id = request.GET['couponId']
     coupon = Coupon.objects.get(id = coupon_id)
@@ -685,6 +652,7 @@ def delete_coupon(request):
 
 
 # Product offers
+@login_required(login_url='admin-login')
 def add_product_offer(request):
 
     form = ProductOfferForm(request.POST or None, request.FILES or None)  
@@ -705,6 +673,8 @@ def add_product_offer(request):
         return render(request,'admin/offer/add_product_offer.html',context)
 
 
+
+@login_required(login_url='admin-login')
 def edit_product_offer(request,prod_id):
     instance = get_object_or_404(ProductOffer, id=prod_id)
     form = ProductOfferForm(request.POST or None, instance=instance)
@@ -729,7 +699,7 @@ def edit_product_offer(request,prod_id):
         return render(request, 'admin/offer/edit_product_offer.html',context)
 
 
-
+@login_required(login_url='admin-login')
 def activate_product_offer(request):
     offer_id = request.GET['proOffId']
    
@@ -741,6 +711,7 @@ def activate_product_offer(request):
     return redirect('admin_offers')
 
 
+@login_required(login_url='admin-login')
 def block_product_offer(request):
     offer_id = request.GET['proOffId']
     offer = ProductOffer.objects.get(id = offer_id)
@@ -750,6 +721,7 @@ def block_product_offer(request):
     return redirect('admin_offers')
 
 
+@login_required(login_url='admin-login')
 def delete_product_offer(request):
     offer_id = request.GET['proOffId']
     offer = ProductOffer.objects.get(id = offer_id)

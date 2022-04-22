@@ -64,6 +64,30 @@ $(document).ready(function() {
     {% block content %}
     <!-- content -->
     {% endblock %}
+    <script>
+      function addCart(plusId){
+         var add = $(this).data('add')
+         var data = {'plusId' : plusId}
+   
+         $.ajax({
+            method: "GET",
+            url:"{% url 'add_cart' %}",
+            data:data,
+            dataType:'json',
+            success: function(data){
+               console.log(data)
+         
+               if(data.status === true){
+                  $('#quantity').val(data.qty)
+   
+               }
+            }
+   
+         })
+   
+   
+      }
+   </script>
 
     <!-- footer -->
    {% include 'includes/footer.html' %}
