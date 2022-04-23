@@ -16,6 +16,8 @@
      <link rel="stylesheet" href="{% static 'assets/vendor/fonts/fontawesome/css/fontawesome-all.css' %}">
      <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
 
 
@@ -93,7 +95,7 @@
                <!-- <a class="btn btn-danger m-1" style="width: 30%;" href="{% url 'adminsale' %}">RESET</a> -->
             </div>
          </div>
-         <h3>Total Sales:$ {{sales_amount}}</h3>
+        
       </article>
    </div>
    <div class=" col-xl-4 mb-1 " >
@@ -140,11 +142,11 @@
 </div>
  <main class="main users chart-page" id="skip-target">
    <div class="container ">
-      <div class="row" id="salestable" >
+      <div class="row">
          <div class="col-lg-12" >
             <div class="table users-table table-wrapper"  >
                <div>
-                  <table id="invoice" class="posts-table table " style="width:100%" >
+                  <table id="reporttable" class="posts-table table " style="width:100%" >
                      <thead >
                         <tr class="users-table-info">
                           
@@ -190,8 +192,15 @@
                            <td>
                               {{data.order.payment.payment_method}}
                            </td>
+
                         </tr>
+                        
                         {% endfor %}
+                        <tr>
+                           <td>
+                              <h3>Total Sales Amount:$ {{sales_amount}}</h3>
+                           </td>
+                        </tr>
                      </tbody>
                   </table>
                </div>
@@ -211,7 +220,7 @@
        
          <div class="col-lg-3  mb-2 me-auto">
             <a href="{% url 'export_csv' %}"  class="btn btn-primary mt-3">Excel</a>
-            <button id="topdf"  class="btn btn-primary mt-3" >PDF</button>
+            <button id="makepdf"  class="btn btn-primary mt-3" >PDF</button>
             <button   onclick = "print()" class="btn btn-primary mt-3">Print</button>
 
          </div>
@@ -223,51 +232,13 @@
 
 
 <!--necessary CDN files-->
-<script src="{% static 'admin/js/html2pdf.bundle.js' %}"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
 
-
-    
-
   <script>
-  
-   document.getElementById('topdf').onclick = function() {
-
-     var rowCount = $("#salestable td").closest("tr").length;
-
-     if(rowCount>0){
-
-       var element = document.getElementById('salestable2');
-     var date = new Date().toISOString().slice(0,19);
-     var opt = {
-       margin:     1,
-       filename: 'Salesreport' +date + '.pdf',
-       image: { type: 'jpeg', quality: 0.98},
-       html2canvas: { scale: 2},
-       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait'}
- 
-     }
-
-     
-     html2pdf(element, opt)
-
-     }else{
-       Swal.fire({
-         icon: 'error',
-         title: 'Oops...',
-         text: 'No data in the table!'
-       })
-     }
-
- 
-   };
-
-
+     const pdfbutton = document.getElementById('makepdf')
    function csvBtn(url,e){
 
      var rowCount = $("#salestable td").closest("tr").length;
@@ -285,30 +256,6 @@
      
    }
 
-
- </script>
-
- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-
-
-<script type="text/javascript">
-  document.getElementById('topdf').onclick = function () {
-      var element = document.getElementById('salestable');
-      html2pdf(element, {
-          margin: 10,
-          filename: 'SalesReport.pdf',
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      });
-  };
-</script> 
-
-
-
-
-<script>
     $('input[name="dates"]').daterangepicker({
       maxDate: moment(),
       ignoreReadonly: true,
@@ -318,6 +265,27 @@
       useCurrent: false
     }
   );
+
+
+
+
+  pdfbutton.addEventListener('click',function(){
+     
+   var element = document.getElementById('reporttable');
+
+   var opt = {
+     margin:       1,
+     filename:     'myfile.pdf',
+     image:        { type: 'jpeg', quality: 0.98 },
+     html2canvas:  { scale: 2 },
+     jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+   };
+   html2pdf().set(opt).from(element).save();
+
+  })
+
+
+
 </script>
 
 
@@ -332,8 +300,6 @@
 </div>
 
 </div>
-
-
 
 <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.js' %}"></script>
 
