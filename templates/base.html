@@ -68,6 +68,7 @@ $(document).ready(function() {
       function addCart(plusId){
          var add = $(this).data('add')
          var data = {'plusId' : plusId}
+         
    
          $.ajax({
             method: "GET",
@@ -79,6 +80,7 @@ $(document).ready(function() {
          
                if(data.status === true){
                   $('#quantity').val(data.qty)
+                  document.getElementById('cart_count').innerHTML=data.cart_count 
    
                }
             }

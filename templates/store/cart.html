@@ -61,7 +61,20 @@
                     success: function(data){
                 
                         if(data.status === true){
-                            $('#quantity').val(data.qty)
+                            $('#quantity').val(data.qty),
+                            console.log(data.qty)
+                            console.log(data.tax)
+                            console.log(data.grand_total)
+                           document.getElementById('grand_total').innerHTML=data.grand_total
+                           document.getElementById('total').innerHTML=data.total
+                            document.getElementById('tax').innerHTML=data.tax  
+                            console.log(data.cart_count)
+                            document.getElementById('cart_count').innerHTML=data.cart_count  
+
+                       //     document.getElementById('sub_total').innerHTML=data.sub_total    
+
+                            
+                            
                         }
                     }
 
@@ -81,6 +94,17 @@
                     success: function(data){
                         if(data.status === true){
                             $('#quantity').val(data.qty)
+                            document.getElementById('grand_total').innerHTML=data.grand_total
+                            document.getElementById('tax').innerHTML=data.tax
+                            document.getElementById('total').innerHTML=data.total
+                          //  document.getElementById('sub_total').innerHTML=data.sub_total
+                          console.log(data.cart_count)
+                          document.getElementById('cart_count').innerHTML=data.cart_count
+                            
+                            
+                            
+
+
 
                         }
                     }
@@ -93,15 +117,52 @@
         
         <td> 
             <div class="price-wrap"> 
-                <var class="price">$ {{cart_item.sub_total }}</var> 
+                <var class="price" id="sub_total">$ {{cart_item.sub_total }}</var> 
                 <small class="text-muted"> $ {{ cart_item.product.price }} each </small> 
             </div> <!-- price-wrap .// -->
         </td>
         <td class="text-right"> 
-        <a href="{% url 'remove_cart_item' cart_item.product.id %}" class="btn btn-danger">Remove</a>
+        <a href="#" onclick="RemCart('{{cart_item.product.id}}')" class="btn btn-danger">Remove</a>
         </td>
     </tr>
-
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        function RemCart(remproId){
+            var data = { 'remproId' : remproId}
+            
+            Swal.fire({
+              title: 'Remove Cart Item !',
+              text: "Are you sure? You will not be able to revert this..",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Remove Item.'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                  console.log("confirm remove")
+                $.ajax({
+                  method: "GET",
+                  url: "{% url 'remove_cart_item'  %}",
+                  data : data,
+                  success:function(response){
+                   
+                    Swal.fire(
+                      'User Deleted',
+                      'User has been successfully Deleted.',
+                      'success'
+                    )
+                  location.reload();
+          
+                  }
+                })
+               
+              }
+            })
+          }
+          
+    </script>
     {% endfor %}
 
         
@@ -117,15 +178,15 @@
             <div class="card-body">
                 <dl class="dlist-align">
                   <dt>Total price:</dt>
-                  <dd class="text-right">$ {{ total }}</dd>
+                  <dd class="text-right" id="total">$ {{ total }}</dd>
                 </dl>
                 <dl class="dlist-align">
                   <dt>Tax:</dt>
-                  <dd class="text-right"> $ {{ tax }}</dd>
+                  <dd class="text-right" id="tax" value="{{ tax }}"> $ {{ tax }}</dd>
                 </dl>
                 <dl class="dlist-align">
                   <dt>Grand Total:</dt>
-                  <dd class="text-right text-dark b"><strong>$ {{ grand_total }}</strong></dd>
+                  <dd class="text-right text-dark b" id="grand_total" value="{{ grand_total }}"><strong>$ {{ grand_total }}</strong></dd>
                 </dl>
                 <hr>
                 <p class="text-center mb-3">

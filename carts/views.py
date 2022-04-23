@@ -101,6 +101,32 @@ def add_cart(request):
             )
             cart_item.save()
             print(cart_item, " created new one")
+        cart_total = CartItem.objects.filter(product=product, cart=cart, user = request.user)
+        quantity = 0
+        total = 0
+
+        for item in cart_total:
+            total += (item.product.price * item.quantity)
+            quantity += item.quantity
+        tax = (5 * total)/100
+        grand_total = total + tax
+        print(tax,'authenticated user')
+        print(grand_total,'authenticated user')
+        cart_count=0
+        try:
+            cart = Cart.objects.filter(cart_id = _cart_id(request))
+            if request.user.is_authenticated:
+                cart_countes = CartItem.objects.all().filter(user=request.user)
+            else:
+                cart_countes = CartItem.objects.all().filter(cart=cart[:1])
+            for cart_item in cart_countes:
+                cart_count += cart_item.quantity
+        except Cart.DoesNotExist:
+            cart_count = 0
+        print(cart_count,"cart count is <===============================")
+        # print(cart_total.sub_total,"cart subtotal how is it")
+        
+
 
     else:
         try:
@@ -122,11 +148,41 @@ def add_cart(request):
             cart_item.save()
             print(cart_item, " created new one")
             print(cart_item.name)
-            
+        cart_total = CartItem.objects.filter(is_active = True, cart=cart)
+        quantity = 0
+        total = 0
+
+        for item in cart_total:
+            total += (item.product.price * item.quantity)
+            quantity += item.quantity
+        tax = (5 * total)/100
+        grand_total = total + tax
+        print(tax,'not authenticated user')
+        print(grand_total,'not authenticated user')
+        cart_count=0
+        try:
+            cart = Cart.objects.filter(cart_id = _cart_id(request))
+            if request.user.is_authenticated:
+                cart_countes = CartItem.objects.all().filter(user=request.user)
+            else:
+                cart_countes = CartItem.objects.all().filter(cart=cart[:1])
+            for cart_item in cart_countes:
+                cart_count += cart_item.quantity
+        except Cart.DoesNotExist:
+            cart_count = 0
+        print(cart_count,"cart count is <===============================")
+        # print(cart_total.sub_total,"cart subtotal how is it")
     return JsonResponse({
-        "status":True,
-        "qty":cart_item.quantity
-    })
+            "status":True,
+            "qty":cart_item.quantity,
+            "tax":tax,
+            "grand_total":grand_total,
+            "total":total,
+            "cart_count":cart_count
+            
+            # "sub_total":cart_total
+            
+        })
 
 def remove_cart(request):
     product_id = request.GET['minusId']
@@ -138,13 +194,44 @@ def remove_cart(request):
         cart_item.save()
     else:
         cart_item.delete()
+    cart_total = CartItem.objects.filter(is_active=True, cart=cart)
+    quantity = 0
+    total = 0
+
+    for item in cart_total:
+        total += (item.product.price * item.quantity)
+        quantity += item.quantity
+    tax = (5 * total)/100
+    grand_total = total + tax
+    cart_count=0
+    try:
+        cart = Cart.objects.filter(cart_id = _cart_id(request))
+        if request.user.is_authenticated:
+            cart_countes = CartItem.objects.all().filter(user=request.user)
+        else:
+            cart_countes = CartItem.objects.all().filter(cart=cart[:1])
+        for cart_item in cart_countes:
+            cart_count += cart_item.quantity
+    except Cart.DoesNotExist:
+        cart_count = 0
+    print(cart_count,"cart count is <===============================")
+    # print(cart_total.sub_total,"cart subtotal how is it")
     return JsonResponse({
         "status":True,
-        "qty":cart_item.quantity
+        "qty":cart_item.quantity,
+        "tax":tax,
+        "grand_total":grand_total,
+        "total":total,
+        "cart_count":cart_count
+        
+        # "sub_total":cart_total
         
     })
 
-def remove_cart_item(request, product_id):
+
+
+def remove_cart_item(request):
+    product_id = request.GET['remproId']
     cart = Cart.objects.get(cart_id =_cart_id(request))
     product = get_object_or_404(Product, id=product_id)
     cart_item = CartItem.objects.get(product=product, cart=cart)

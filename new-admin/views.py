@@ -281,34 +281,27 @@ def add_product_gallery_image(request):
 
 # Product edit
 @login_required(login_url='admin-login')
-def edit_product(request ,id):
-    
-     if request.user.is_authenticated:
-        if request.user.is_superadmin:
-            instance = get_object_or_404(Product, id=id)
-            form = ProductForm(request.FILES or None, instance=instance)
-            if request.method == "POST":
-                if form.is_valid():
-                    form.save()
-                    messages.success(request,'Product has been updated')
-                    return redirect('products_list')
-                else:
-                    instance = get_object_or_404(Product, id=id)
-                    form = ProductForm(request.FILES or None, instance=instance)  
-                    context = {
-                        'form'     : form,
-                        'product':instance,
-                        }
-                    return render(request, 'admin/products/edit_product.html',context)
-            else:
-                instance = get_object_or_404(Product, id=id)
-                form = ProductForm(request.FILES or None, instance=instance)  
-                context = {
-                    'form'     : form,
-                    'product':instance,
-                    }
-                return render(request, 'admin/products/edit_product.html',context)
+def edit_product(request,id):
+    instance = get_object_or_404(Product, id=id)
+    form = ProductForm(request.POST or None, request.FILES or None, instance=instance)
 
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            messages.success(request,'Product has been updated')
+            return redirect('products_list')
+        else:  
+            context = {
+                'form': form,
+                'product':instance,
+                }
+            return render(request, 'admin/products/edit_product.html',context)
+    else:  
+        context = {
+            'form': form,
+            'product':instance,
+            }
+        return render(request, 'admin/products/edit_product.html',context)
 # product delete
 @login_required(login_url='admin-login')
 def product_delete(request):
